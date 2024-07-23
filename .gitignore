@@ -2,3 +2,6 @@ env/
 .env
 files/
 .cache/
+.steamlit
+.steamlit/secrets.toml
+.DS_Store
