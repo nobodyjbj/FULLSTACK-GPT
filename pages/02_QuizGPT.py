@@ -218,6 +218,8 @@ def split_file(file):
 
 
 @st.cache_data(show_spinner="Making quiz...")
+# 해시할 수 없는 매개변수가 있거나, streamlit이 데이터의 서명을 만들 수 없는 경우
+# 다른 매개변수변수를 넣어서 함수를 재실행 할 수 있다. 캐싱데이터의 _ 를 붙이는건 streamlit의 문법이다.
 def run_quiz_chain(_docs, topic):
     chain = {"context": questions_chain} | formatting_chain | output_parser
     return chain.invoke(_docs)
@@ -264,8 +266,19 @@ if not docs:
     """
     )
 else:
-    start = st.button("Generate Quiz")
+    response = run_quiz_chain(docs, topic if topic else file.name)
 
-    if start:
-        response = run_quiz_chain(docs, topic if topic else file.name)
-        st.write(response)
+    with st.form("questions_form"):
+        for idx, question in enumerate(response["questions"]):
+            value = st.radio(
+                "Select an option.",
+                [answer["answer"] for answer in question["answers"]],
+                key=f"{idx}_radio",
+                index=None,
+            )
+            if {"answer": value, "correct": True} in question["answers"]:
+                st.success("Correct!")
+            elif value is not None:
+                st.error("Wrong!")
+
+        button = st.form_submit_button("Submit")
