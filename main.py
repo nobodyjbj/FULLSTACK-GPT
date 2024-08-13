@@ -32,7 +32,7 @@ class SixNumbers(BaseModel):
         "x-openai-isConsequential": False,
     },
 )
-def get_quote(request: Request):
+def get_six_number(request: Request):
     print(request.headers)
     return {
         "numbers": "1, 2, 3, 4, 5, 6",
